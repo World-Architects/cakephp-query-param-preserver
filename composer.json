@@ -1,0 +1,34 @@
+{
+    "name": "psa/cakephp-query-param-preserver",
+    "description": "A CakePHP Query Param Preserver Component",
+    "homepage": "http://www.world-architects.com/",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "require": {
+        "cakephp/plugin-installer": "*",
+        "cakephp/cakephp": "~3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Psa\\QueryParamPreserver\\": "src",
+            "Psa\\QueryParamPreserver\\Test\\Fixture\\": "tests\\Fixture"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests",
+            "Psa\\QueryParamPreserver\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "App\\Console\\Installer::postInstall"
+        ],
+        "post-autoload-dump": "Cake\\Composer\\Installer\\PluginInstaller::postAutoloadDump"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
