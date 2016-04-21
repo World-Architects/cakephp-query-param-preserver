@@ -1,11 +1,13 @@
 # Query Param Preserver Component
 
 ## Setup
+Checkout the plugin using composer.
+`composer require psa/cakephp-query-param-preserver:dev-master`
 
 [Load the plugin](http://book.cakephp.org/3.0/en/plugins.html#loading-a-plugin) and define the actions for which you want to preserve the query params. The plugin won't do anything by default, you have to define the actions explicitly.
 
 ```php
-$this->loadComponent('Psa/QueryParamPreserver.QueryParamPreserver, [
+$this->loadComponent('Psa/QueryParamPreserver.QueryParamPreserver', [
     'actions' => [
         'index'
     ]
