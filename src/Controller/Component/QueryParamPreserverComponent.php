@@ -73,7 +73,7 @@ class QueryParamPreserverComponent extends Component {
     /**
      * Applies the preserved query params
      *
-     * @return void
+     * @return \Cake\Network\Response|null
      */
     public function apply()
     {
@@ -85,7 +85,7 @@ class QueryParamPreserverComponent extends Component {
             );
             $request = $this->_registry->getController()->request;
             if ($request->here !== Router::url(['?' => $this->request->query])) {
-                $this->_registry->getController()->redirect(['?' => $this->request->query]);
+                return $this->_registry->getController()->redirect(['?' => $this->request->query]);
             };
         }
     }
@@ -93,12 +93,12 @@ class QueryParamPreserverComponent extends Component {
     /**
      * beforeFilter callback
      *
-     * @return void
+     * @return \Cake\Network\Response|null
      */
     public function beforeFilter()
     {
         if ($this->config('autoApply') && $this->actionCheck()) {
-            $this->apply();
+            return $this->apply();
         }
     }
 
