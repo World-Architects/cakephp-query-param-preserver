@@ -20,7 +20,8 @@ class QueryParamPreserverComponent extends Component {
     public $_defaultConfig = [
         'autoApply' => true,
         'actions' => [],
-        'ignoreParams' => []
+        'ignoreParams' => [],
+        'disablePreserveWithParam' => 'preserve'
     ];
 
     /**
@@ -49,6 +50,7 @@ class QueryParamPreserverComponent extends Component {
                 }
             }
         }
+
         $this->request->session()->write(
             $this->_hashKey(),
             $query
@@ -97,7 +99,19 @@ class QueryParamPreserverComponent extends Component {
      */
     public function beforeFilter()
     {
-        if ($this->config('autoApply') && $this->actionCheck()) {
+        $params = $this->request->getQueryParams();
+        $ignoreParam = $this->getConfig('disablePreserveWithParam');
+
+        if ($this->getConfig('autoApply') && $this->actionCheck()) {
+            if (isset($params[$ignoreParam])) {
+                unset($params[$ignoreParam]);
+                $this->request->session()->delete($this->_hashKey());
+                $this->request = $this->request->withQueryParams($params);
+                $this->getController()->redirect([
+                    '?' => $params
+                ]);
+            }
+
             return $this->apply();
         }
     }
@@ -109,7 +123,7 @@ class QueryParamPreserverComponent extends Component {
      */
     public function beforeRender()
     {
-        if ($this->config('autoApply') && $this->actionCheck()) {
+        if ($this->getConfig('autoApply') && $this->actionCheck()) {
             $this->preserve();
         }
     }
