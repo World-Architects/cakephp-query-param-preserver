@@ -31,7 +31,8 @@ class QueryParamPreserverComponent extends Component {
      */
     public function actionCheck()
     {
-        return in_array($this->request->action, $this->config('actions'));
+        $request = $this->getController()->request;
+        return in_array($request->action, $this->getConfig('actions'));
     }
 
     /**
@@ -41,8 +42,9 @@ class QueryParamPreserverComponent extends Component {
      */
     public function preserve()
     {
-        $query = $this->request->query;
-        $ignoreParams = $this->config('ignoreParams');
+        $request = $this->getController()->request;
+        $query = $request->getQueryParams();
+        $ignoreParams = $this->getConfig('ignoreParams');
         if (!empty($ignoreParams)) {
             foreach ($ignoreParams as $param) {
                 if (isset($query[$param])) {
@@ -51,7 +53,7 @@ class QueryParamPreserverComponent extends Component {
             }
         }
 
-        $this->request->session()->write(
+        $request->session()->write(
             $this->_hashKey(),
             $query
         );
@@ -64,12 +66,13 @@ class QueryParamPreserverComponent extends Component {
      */
     protected function _hashKey()
     {
+        $request = $this->getController()->request;
         $string = '';
-        if (!empty($this->request->plugin)) {
-            $string .= $this->request->plugin;
+        if (!empty($request->plugin)) {
+            $string .= $request->plugin;
         }
-        $string .= $this->request->controller . '.' . $this->request->action;
-        return $string;
+
+        return $string . $request->controller . '.' . $request->action;
     }
 
     /**
@@ -79,15 +82,17 @@ class QueryParamPreserverComponent extends Component {
      */
     public function apply()
     {
+        $request = $this->getController()->request;
         $key = $this->_hashKey();
-        if (empty($this->request->query) && $this->request->session()->check($key)) {
-            $this->request->query = array_merge(
-                (array)$this->request->session()->read($key),
-                $this->request->query
+
+        if (empty($request->query) && $request->session()->check($key)) {
+            $queryParams = array_merge(
+                (array)$request->session()->read($key),
+                $request->getQueryParams()
             );
-            $request = $this->_registry->getController()->request;
-            if ($request->here !== Router::url(['?' => $this->request->query])) {
-                return $this->_registry->getController()->redirect(['?' => $this->request->query]);
+
+            if ($request->here !== Router::url(['?' => $queryParams])) {
+                return $this->_registry->getController()->redirect(['?' => $queryParams]);
             };
         }
     }
@@ -99,14 +104,15 @@ class QueryParamPreserverComponent extends Component {
      */
     public function beforeFilter()
     {
-        $params = $this->request->getQueryParams();
+        $request = $this->getController()->request;
+        $params = $request->getQueryParams();
         $ignoreParam = $this->getConfig('disablePreserveWithParam');
 
         if ($this->getConfig('autoApply') && $this->actionCheck()) {
             if (isset($params[$ignoreParam])) {
                 unset($params[$ignoreParam]);
-                $this->request->session()->delete($this->_hashKey());
-                $this->request = $this->request->withQueryParams($params);
+                $request->session()->delete($this->_hashKey());
+                $this->getController()->request = $request->withQueryParams($params);
                 $this->getController()->redirect([
                     '?' => $params
                 ]);
@@ -127,5 +133,4 @@ class QueryParamPreserverComponent extends Component {
             $this->preserve();
         }
     }
-
 }

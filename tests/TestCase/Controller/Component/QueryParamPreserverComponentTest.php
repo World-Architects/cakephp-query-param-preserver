@@ -18,5 +18,4 @@ class QueryParamPreserverComponentTest extends TestCase {
     {
         parent::setUp();
     }
-
 }
