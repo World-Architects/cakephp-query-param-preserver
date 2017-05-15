@@ -1,6 +1,7 @@
 # Query Param Preserver Component
 
 ## Setup
+
 Checkout the plugin using composer.
 `composer require psa/cakephp-query-param-preserver:dev-master`
 
@@ -8,11 +9,18 @@ Checkout the plugin using composer.
 
 ```php
 $this->loadComponent('Psa/QueryParamPreserver.QueryParamPreserver', [
+    // The action the component should be active on
     'actions' => [
         'index'
+    ],
+    // You want to ignore the page param on pages with pagination
+    'ignoreParams' => [
+        'page'
     ]
 ]);
 ```
+
+
 
 ## License & Copyright
 
