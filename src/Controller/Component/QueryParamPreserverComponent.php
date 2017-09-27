@@ -2,7 +2,6 @@
 namespace Psa\QueryParamPreserver\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\Routing\Router;
 
 /**
  * QueryParamPreserverComponent
@@ -32,7 +31,11 @@ class QueryParamPreserverComponent extends Component {
     public function actionCheck()
     {
         $request = $this->getController()->request;
-        return in_array($request->action, $this->getConfig('actions'));
+
+        return in_array(
+            $request->getParam('action'),
+            $this->getConfig('actions')
+        );
     }
 
     /**
@@ -44,19 +47,22 @@ class QueryParamPreserverComponent extends Component {
     {
         $request = $this->getController()->request;
         $query = $request->getQueryParams();
-        $ignoreParams = $this->getConfig('ignoreParams');
-        if (!empty($ignoreParams)) {
-            foreach ($ignoreParams as $param) {
-                if (isset($query[$param])) {
-                    unset($query[$param]);
+
+        if ($query) {
+            $ignoreParams = $this->getConfig('ignoreParams');
+            if (!empty($ignoreParams)) {
+                foreach ($ignoreParams as $param) {
+                    if (isset($query[$param])) {
+                        unset($query[$param]);
+                    }
                 }
             }
-        }
 
-        $request->session()->write(
-            $this->_hashKey(),
-            $query
-        );
+            $request->getSession()->write(
+                $this->_hashKey(),
+                $query
+            );
+        }
     }
 
     /**
@@ -66,60 +72,62 @@ class QueryParamPreserverComponent extends Component {
      */
     protected function _hashKey()
     {
-        $request = $this->getController()->request;
-        $string = '';
-        if (!empty($request->plugin)) {
-            $string .= $request->plugin;
-        }
-
-        return $string . $request->controller . '.' . $request->action;
+        return $this->getController()->request->getUri()->getPath();
     }
 
     /**
      * Applies the preserved query params
      *
-     * @return \Cake\Network\Response|null
+     * @return \Cake\Http\Response|null
      */
     public function apply()
     {
         $request = $this->getController()->request;
         $key = $this->_hashKey();
 
-        if (empty($request->query) && $request->session()->check($key)) {
-            $queryParams = array_merge(
-                (array)$request->session()->read($key),
-                $request->getQueryParams()
-            );
-
-            if ($request->here !== Router::url(['?' => $queryParams])) {
-                return $this->_registry->getController()->redirect(['?' => $queryParams]);
-            };
+        if (empty($request->getQuery()) && $request->getSession()->check($key)) {
+            if(!empty($request->getSession()->read($key))) {
+                return $this->getController()->redirect(
+                    $key
+                    . '?' . http_build_query($request->getSession()->read($key))
+                );
+            }
         }
     }
 
     /**
      * beforeFilter callback
      *
-     * @return \Cake\Network\Response|null
+     * @return \Cake\Http\Response|null
      */
     public function beforeFilter()
     {
+        if ($this->getConfig('autoApply') && $this->actionCheck()) {
+            return $this->_autoApply();
+        }
+    }
+
+    /**
+     * Automatically applies the preserved query params
+     *
+     * Called in the beforeFilter() method
+     *
+     * @return \Cake\Http\Response|null
+     */
+    protected function _autoApply() {
         $request = $this->getController()->request;
         $params = $request->getQueryParams();
         $ignoreParam = $this->getConfig('disablePreserveWithParam');
 
-        if ($this->getConfig('autoApply') && $this->actionCheck()) {
-            if (isset($params[$ignoreParam])) {
-                unset($params[$ignoreParam]);
-                $request->session()->delete($this->_hashKey());
-                $this->getController()->request = $request->withQueryParams($params);
-                $this->getController()->redirect([
-                    '?' => $params
-                ]);
-            }
+        if (isset($params[$ignoreParam])) {
+            unset($params[$ignoreParam]);
 
-            return $this->apply();
+            $request->getSession()->delete($this->_hashKey());
+
+            return $this->getController()->redirect($this->_hashKey());
         }
+
+        return $this->apply();
     }
 
     /**
