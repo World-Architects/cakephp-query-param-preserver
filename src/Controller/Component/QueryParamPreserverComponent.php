@@ -2,7 +2,6 @@
 namespace Psa\QueryParamPreserver\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\Routing\Router;
 
 /**
  * QueryParamPreserverComponent
@@ -32,7 +31,11 @@ class QueryParamPreserverComponent extends Component {
     public function actionCheck()
     {
         $request = $this->getController()->request;
-        return in_array($request->action, $this->getConfig('actions'));
+
+        return in_array(
+            $request->getParam('action'),
+            $this->getConfig('actions')
+        );
     }
 
     /**
@@ -55,7 +58,7 @@ class QueryParamPreserverComponent extends Component {
                 }
             }
 
-            $request->session()->write(
+            $request->getSession()->write(
                 $this->_hashKey(),
                 $query
             );
@@ -75,7 +78,7 @@ class QueryParamPreserverComponent extends Component {
     /**
      * Applies the preserved query params
      *
-     * @return \Cake\Network\Response|null
+     * @return \Cake\Http\Response|null
      */
     public function apply()
     {
@@ -86,7 +89,8 @@ class QueryParamPreserverComponent extends Component {
             if(!empty($request->getSession()->read($key))) {
                 return $this->getController()->redirect(
                     $key
-                    . '?' . http_build_query($request->getSession()->read($key)));
+                    . '?' . http_build_query($request->getSession()->read($key))
+                );
             }
         }
     }
@@ -94,7 +98,7 @@ class QueryParamPreserverComponent extends Component {
     /**
      * beforeFilter callback
      *
-     * @return \Cake\Network\Response|null
+     * @return \Cake\Http\Response|null
      */
     public function beforeFilter()
     {
@@ -107,7 +111,7 @@ class QueryParamPreserverComponent extends Component {
                 unset($params[$ignoreParam]);
 
                 $request->getSession()->delete($this->_hashKey());
-                
+
                 return $this->getController()->redirect($this->_hashKey());
             }
 

@@ -18,4 +18,24 @@ class QueryParamPreserverComponentTest extends TestCase {
     {
         parent::setUp();
     }
+
+    /**
+     * testPreserve
+     *
+     * @return void
+     */
+    public function testPreserve()
+    {
+
+    }
+
+    /**
+     * testApply
+     *
+     * @return void
+     */
+    public function testApply()
+    {
+
+    }
 }
