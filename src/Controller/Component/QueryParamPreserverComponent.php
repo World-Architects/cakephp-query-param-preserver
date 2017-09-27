@@ -44,19 +44,22 @@ class QueryParamPreserverComponent extends Component {
     {
         $request = $this->getController()->request;
         $query = $request->getQueryParams();
-        $ignoreParams = $this->getConfig('ignoreParams');
-        if (!empty($ignoreParams)) {
-            foreach ($ignoreParams as $param) {
-                if (isset($query[$param])) {
-                    unset($query[$param]);
+
+        if ($query) {
+            $ignoreParams = $this->getConfig('ignoreParams');
+            if (!empty($ignoreParams)) {
+                foreach ($ignoreParams as $param) {
+                    if (isset($query[$param])) {
+                        unset($query[$param]);
+                    }
                 }
             }
-        }
 
-        $request->session()->write(
-            $this->_hashKey(),
-            $query
-        );
+            $request->session()->write(
+                $this->_hashKey(),
+                $query
+            );
+        }
     }
 
     /**
@@ -66,13 +69,7 @@ class QueryParamPreserverComponent extends Component {
      */
     protected function _hashKey()
     {
-        $request = $this->getController()->request;
-        $string = '';
-        if (!empty($request->plugin)) {
-            $string .= $request->plugin;
-        }
-
-        return $string . $request->controller . '.' . $request->action;
+        return $this->getController()->request->getUri()->getPath();
     }
 
     /**
@@ -85,15 +82,12 @@ class QueryParamPreserverComponent extends Component {
         $request = $this->getController()->request;
         $key = $this->_hashKey();
 
-        if (empty($request->query) && $request->session()->check($key)) {
-            $queryParams = array_merge(
-                (array)$request->session()->read($key),
-                $request->getQueryParams()
-            );
-
-            if ($request->here !== Router::url(['?' => $queryParams])) {
-                return $this->_registry->getController()->redirect(['?' => $queryParams]);
-            };
+        if (empty($request->getQuery()) && $request->getSession()->check($key)) {
+            if(!empty($request->getSession()->read($key))) {
+                return $this->getController()->redirect(
+                    $key
+                    . '?' . http_build_query($request->getSession()->read($key)));
+            }
         }
     }
 
@@ -111,11 +105,10 @@ class QueryParamPreserverComponent extends Component {
         if ($this->getConfig('autoApply') && $this->actionCheck()) {
             if (isset($params[$ignoreParam])) {
                 unset($params[$ignoreParam]);
-                $request->session()->delete($this->_hashKey());
-                $this->getController()->request = $request->withQueryParams($params);
-                $this->getController()->redirect([
-                    '?' => $params
-                ]);
+
+                $request->getSession()->delete($this->_hashKey());
+                
+                return $this->getController()->redirect($this->_hashKey());
             }
 
             return $this->apply();
