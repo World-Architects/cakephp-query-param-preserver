@@ -102,21 +102,32 @@ class QueryParamPreserverComponent extends Component {
      */
     public function beforeFilter()
     {
+        if ($this->getConfig('autoApply') && $this->actionCheck()) {
+            return $this->_autoApply();
+        }
+    }
+
+    /**
+     * Automatically applies the preserved query params
+     *
+     * Called in the beforeFilter() method
+     *
+     * @return \Cake\Http\Response|null
+     */
+    protected function _autoApply() {
         $request = $this->getController()->request;
         $params = $request->getQueryParams();
         $ignoreParam = $this->getConfig('disablePreserveWithParam');
 
-        if ($this->getConfig('autoApply') && $this->actionCheck()) {
-            if (isset($params[$ignoreParam])) {
-                unset($params[$ignoreParam]);
+        if (isset($params[$ignoreParam])) {
+            unset($params[$ignoreParam]);
 
-                $request->getSession()->delete($this->_hashKey());
+            $request->getSession()->delete($this->_hashKey());
 
-                return $this->getController()->redirect($this->_hashKey());
-            }
-
-            return $this->apply();
+            return $this->getController()->redirect($this->_hashKey());
         }
+
+        return $this->apply();
     }
 
     /**
