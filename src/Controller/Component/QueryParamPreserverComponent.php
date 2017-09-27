@@ -44,19 +44,22 @@ class QueryParamPreserverComponent extends Component {
     {
         $request = $this->getController()->request;
         $query = $request->getQueryParams();
-        $ignoreParams = $this->getConfig('ignoreParams');
-        if (!empty($ignoreParams)) {
-            foreach ($ignoreParams as $param) {
-                if (isset($query[$param])) {
-                    unset($query[$param]);
+
+        if ($query) {
+            $ignoreParams = $this->getConfig('ignoreParams');
+            if (!empty($ignoreParams)) {
+                foreach ($ignoreParams as $param) {
+                    if (isset($query[$param])) {
+                        unset($query[$param]);
+                    }
                 }
             }
-        }
 
-        $request->session()->write(
-            $this->_hashKey(),
-            $query
-        );
+            $request->session()->write(
+                $this->_hashKey(),
+                $query
+            );
+        }
     }
 
     /**
