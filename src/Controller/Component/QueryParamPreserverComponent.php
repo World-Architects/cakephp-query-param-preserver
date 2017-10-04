@@ -58,7 +58,7 @@ class QueryParamPreserverComponent extends Component {
                 }
             }
 
-            $request->getSession()->write(
+            $request->session()->write(
                 $this->_hashKey(),
                 $query
             );
@@ -85,11 +85,11 @@ class QueryParamPreserverComponent extends Component {
         $request = $this->getController()->request;
         $key = $this->_hashKey();
 
-        if (empty($request->getQuery()) && $request->getSession()->check($key)) {
-            if(!empty($request->getSession()->read($key))) {
+        if (empty($request->getQuery()) && $request->session()->check($key)) {
+            if(!empty($request->session()->read($key))) {
                 return $this->getController()->redirect(
                     $key
-                    . '?' . http_build_query($request->getSession()->read($key))
+                    . '?' . http_build_query($request->session()->read($key))
                 );
             }
         }
@@ -122,7 +122,7 @@ class QueryParamPreserverComponent extends Component {
         if (isset($params[$ignoreParam])) {
             unset($params[$ignoreParam]);
 
-            $request->getSession()->delete($this->_hashKey());
+            $request->session()->delete($this->_hashKey());
 
             return $this->getController()->redirect($this->_hashKey());
         }
