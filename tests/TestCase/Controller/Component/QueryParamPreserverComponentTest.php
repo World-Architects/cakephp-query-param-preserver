@@ -13,7 +13,8 @@ use Psa\QueryParamPreserver\Controller\Component\QueryParamPreserverComponent;
  * @copyright 2016 PSA Publishers Ltd.
  * @license MIT
  */
-class QueryParamPreserverComponentTest extends TestCase {
+class QueryParamPreserverComponentTest extends TestCase
+{
 
     /**
      * Query Param Preserver Component
@@ -42,7 +43,8 @@ class QueryParamPreserverComponentTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function tearDown() {
+    public function tearDown()
+    {
         parent::tearDown();
     }
 
@@ -53,7 +55,6 @@ class QueryParamPreserverComponentTest extends TestCase {
      */
     public function testPreserve()
     {
-
     }
 
     /**
@@ -63,6 +64,5 @@ class QueryParamPreserverComponentTest extends TestCase {
      */
     public function testApply()
     {
-
     }
 }

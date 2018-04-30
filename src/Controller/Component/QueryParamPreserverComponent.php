@@ -9,14 +9,15 @@ use Cake\Controller\Component;
  * @copyright 2016 PSA Publishers Ltd.
  * @license MIT
  */
-class QueryParamPreserverComponent extends Component {
+class QueryParamPreserverComponent extends Component
+{
 
     /**
      * Default Config
      *
      * @var array
      */
-    public $_defaultConfig = [
+    protected $_defaultConfig = [
         'autoApply' => true,
         'actions' => [],
         'ignoreParams' => [],
@@ -86,10 +87,9 @@ class QueryParamPreserverComponent extends Component {
         $key = $this->_hashKey();
 
         if (empty($request->getQuery()) && $request->session()->check($key)) {
-            if(!empty($request->session()->read($key))) {
+            if (!empty($request->session()->read($key))) {
                 return $this->getController()->redirect(
-                    $key
-                    . '?' . http_build_query($request->session()->read($key))
+                    $key . '?' . http_build_query($request->session()->read($key))
                 );
             }
         }
@@ -114,7 +114,8 @@ class QueryParamPreserverComponent extends Component {
      *
      * @return \Cake\Http\Response|null
      */
-    protected function _autoApply() {
+    protected function _autoApply()
+    {
         $request = $this->getController()->request;
         $params = $request->getQueryParams();
         $ignoreParam = $this->getConfig('disablePreserveWithParam');
