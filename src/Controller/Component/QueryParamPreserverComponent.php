@@ -17,7 +17,7 @@ class QueryParamPreserverComponent extends Component
      *
      * @var array
      */
-    public $_defaultConfig = [
+    protected $_defaultConfig = [
         'autoApply' => true,
         'actions' => [],
         'ignoreParams' => [],
@@ -59,7 +59,7 @@ class QueryParamPreserverComponent extends Component
                 }
             }
 
-            $request->getSession()->write(
+            $request->session()->write(
                 $this->_hashKey(),
                 $query
             );
@@ -123,7 +123,7 @@ class QueryParamPreserverComponent extends Component
         if (isset($params[$ignoreParam])) {
             unset($params[$ignoreParam]);
 
-            $request->getSession()->delete($this->_hashKey());
+            $request->session()->delete($this->_hashKey());
 
             return $this->getController()->redirect($this->_hashKey());
         }
