@@ -9,14 +9,15 @@ use Cake\Controller\Component;
  * @copyright 2016 PSA Publishers Ltd.
  * @license MIT
  */
-class QueryParamPreserverComponent extends Component {
+class QueryParamPreserverComponent extends Component
+{
 
     /**
      * Default Config
      *
      * @var array
      */
-    public $_defaultConfig = [
+    protected $_defaultConfig = [
         'autoApply' => true,
         'actions' => [],
         'ignoreParams' => [],
@@ -30,7 +31,7 @@ class QueryParamPreserverComponent extends Component {
      */
     public function actionCheck()
     {
-        $request = $this->getController()->request;
+        $request = $this->getController()->getRequest();
 
         return in_array(
             $request->getParam('action'),
@@ -45,7 +46,7 @@ class QueryParamPreserverComponent extends Component {
      */
     public function preserve()
     {
-        $request = $this->getController()->request;
+        $request = $this->getController()->getRequest();
         $query = $request->getQueryParams();
 
         if ($query) {
@@ -72,7 +73,7 @@ class QueryParamPreserverComponent extends Component {
      */
     protected function _hashKey()
     {
-        return $this->getController()->request->getUri()->getPath();
+        return $this->getController()->getRequest()->getUri()->getPath();
     }
 
     /**
@@ -82,14 +83,13 @@ class QueryParamPreserverComponent extends Component {
      */
     public function apply()
     {
-        $request = $this->getController()->request;
+        $request = $this->getController()->getRequest();
         $key = $this->_hashKey();
 
-        if (empty($request->getQuery()) && $request->session()->check($key)) {
-            if(!empty($request->session()->read($key))) {
+        if (empty($request->getQuery()) && $request->getSession()->check($key)) {
+            if (!empty($request->getSession()->read($key))) {
                 return $this->getController()->redirect(
-                    $key
-                    . '?' . http_build_query($request->session()->read($key))
+                    $key . '?' . http_build_query($request->getSession()->read($key))
                 );
             }
         }
@@ -114,8 +114,9 @@ class QueryParamPreserverComponent extends Component {
      *
      * @return \Cake\Http\Response|null
      */
-    protected function _autoApply() {
-        $request = $this->getController()->request;
+    protected function _autoApply()
+    {
+        $request = $this->getController()->getRequest();
         $params = $request->getQueryParams();
         $ignoreParam = $this->getConfig('disablePreserveWithParam');
 
