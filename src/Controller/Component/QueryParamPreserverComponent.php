@@ -120,7 +120,7 @@ class QueryParamPreserverComponent extends Component
         $params = $request->getQueryParams();
         $ignoreParam = $this->getConfig('disablePreserveWithParam');
 
-        if (isset($params[$ignoreParam])) {
+        if (isset($params[$ignoreParam]) && (bool)$params[$ignoreParam] === false) {
             unset($params[$ignoreParam]);
 
             $request->session()->delete($this->_hashKey());
