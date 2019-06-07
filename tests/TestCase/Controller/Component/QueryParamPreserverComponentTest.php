@@ -15,13 +15,26 @@ use Psa\QueryParamPreserver\Controller\Component\QueryParamPreserverComponent;
  */
 class QueryParamPreserverComponentTest extends TestCase
 {
-
     /**
      * Query Param Preserver Component
      *
      * @var \Psa\QueryParamPreserver\Controller\Component\QueryParamPreserverComponent
      */
-    public $Preserver;
+    protected $Preserver;
+
+    /**
+     * Server Request
+     *
+     * @var \Cake\Http\ServerRequest
+     */
+    protected $Request;
+
+    /**
+     * Response
+     *
+     * @var \Cake\Http\Response
+     */
+    protected $Response;
 
     /**
      * @inheritdoc
@@ -30,12 +43,12 @@ class QueryParamPreserverComponentTest extends TestCase
     {
         parent::setUp();
 
-        $request = new ServerRequest();
-        $response = $this->getMockBuilder(Response::class)
+        $this->Request = new ServerRequest();
+        $this->Response = $this->getMockBuilder(Response::class)
             ->setMethods(['stop'])
             ->getMock();
 
-        $controller = new Controller($request, $response);
+        $controller = new Controller($this->Request, $this->Response);
 
         $this->Preserver = new QueryParamPreserverComponent($controller->components());
     }
@@ -46,5 +59,31 @@ class QueryParamPreserverComponentTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
+    }
+
+    /**
+     * testPreserve
+     *
+     * @return void
+     */
+    public function testPreserve()
+    {
+        $request = $this->Preserver->getController()->getRequest()->withQueryParams([
+            'first' => 1,
+            'second' => '2nd'
+        ]);
+        $this->Preserver->getController()->setRequest($request);
+        $this->Preserver->preserve();
+
+        $result = $this->Preserver->getController()->getRequest()->getSession()->read();
+
+        $expected = [
+                '/' => [
+                        'first' => (int) 1,
+                        'second' => '2nd'
+                ]
+        ];
+
+        $this->assertEquals($expected, $result);
     }
 }

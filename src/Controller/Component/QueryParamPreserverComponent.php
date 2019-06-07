@@ -59,7 +59,7 @@ class QueryParamPreserverComponent extends Component
                 }
             }
 
-            $request->session()->write(
+            $request->getSession()->write(
                 $this->_hashKey(),
                 $query
             );
@@ -123,7 +123,7 @@ class QueryParamPreserverComponent extends Component
         if (isset($params[$ignoreParam]) && (bool)$params[$ignoreParam] === false) {
             unset($params[$ignoreParam]);
 
-            $request->session()->delete($this->_hashKey());
+            $request->getSession()->delete($this->_hashKey());
 
             return $this->getController()->redirect($this->_hashKey());
         }

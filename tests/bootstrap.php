@@ -1,6 +1,8 @@
 <?php
 use Cake\Core\Plugin;
 
+error_reporting(E_ALL ^ E_USER_DEPRECATED);
+
 $findRoot = function ($root) {
     do {
         $lastRoot = $root;

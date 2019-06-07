@@ -3,6 +3,7 @@
 A plugin to preserve the query params between requests and even visits by storing them in the users session.
 
 Be aware that this is has downsides, for example if two tabs are open and an user modifies the params in one it will affect the next page reload in the other tab as well.
+
 ## Setup
 
 Checkout the plugin using composer.
@@ -26,7 +27,10 @@ $this->loadComponent('Psa/QueryParamPreserver.QueryParamPreserver', [
 ]);
 ```
 
+## Versions
 
+* CakePHP < 3.6 use v1.0
+* CakePHP >= 3.6 use v2.0
 
 ## License & Copyright
 
