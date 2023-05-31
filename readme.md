@@ -26,7 +26,9 @@ $this->loadComponent('Psa/QueryParamPreserver.QueryParamPreserver', [
 ]);
 ```
 
+## Resetting query params
 
+Add query parameter `preserve=0` to URLs to reset previously stored query params. Use it in your Reset Filter buttons.
 
 ## License & Copyright
 
