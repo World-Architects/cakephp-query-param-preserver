@@ -26,7 +26,7 @@ class QueryParamPreserverComponentTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -43,7 +43,7 @@ class QueryParamPreserverComponentTest extends TestCase
     /**
      * @inheritDoc
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
     }
